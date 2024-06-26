@@ -251,7 +251,10 @@ int findCluster(struct FAT32DriverRequest request){
     read_clusters(&fat32_driver_state.dir_table_buf.table, request.parent_cluster_number, 1);
     int idx = findEntry(fat32_driver_state.dir_table_buf, request.name, request.ext);
     if(idx==-9999){
-        return idx*-1;
+        return 9999;
+    }
+    if(fat32_driver_state.dir_table_buf.table[idx].attribute!=ATTR_SUBDIRECTORY){
+        return 9999;
     }
     return (fat32_driver_state.dir_table_buf.table[idx].cluster_high<<16)|fat32_driver_state.dir_table_buf.table[idx].cluster_low;
 }
