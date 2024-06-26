@@ -580,7 +580,23 @@ void traverseFolder(int cluster, int destination,int isDelete){
         }
         struct FAT32DirectoryEntry entry = cwd.table[i];
         if(cwd.table[i].attribute==ATTR_SUBDIRECTORY){
-            traverseFolder((cwd.table[i].cluster_high<<16)|(cwd.table[i].cluster_low),destination,isDelete);
+            struct FAT32DriverRequest request = {
+                .buf = NULL,
+                .name = "\0\0\0\0\0\0\0\0",
+                .ext = "\0\0\0",
+                .buffer_size = 0,
+                .parent_cluster_number = destination
+            };
+            memcpy(request.name, cwd.table[i].name, 8);
+            memcpy(request.ext, cwd.table[i].ext, 3);
+
+            int8_t retcode;
+            syscall(2, (uint32_t)&request, (uint32_t)&retcode, 0);
+
+            int new_cluster;
+            syscall(11,(uint32_t)&request,(uint32_t)&new_cluster,0);
+
+            traverseFolder((cwd.table[i].cluster_high<<16)|(cwd.table[i].cluster_low),new_cluster,isDelete);
         }else{
             copy(entry.name,entry.ext,cluster,entry.name,entry.ext,destination);
             if(isDelete==1){
