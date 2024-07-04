@@ -1,10 +1,18 @@
-<h1 align="middle"> SOSIS</h1>
+<h1 align="middle"> SOSIS</h1>  
+<h2 align="middle"> Simple Operating System using QEMU with C Language </h1>
+
 <img src="image.jpg">
 
-## How to run
+## How to Run
+1. First, run build using makefile to insert storage bin and compile the OS  
+```
+make build
+```
+2. Then, run the OS using this command  
 ```
 make run
 ```
+3. If you want to use the previous saved state of the OS, just run `make run` the next time you want to use the OS. If you want to reset the storage bin, run `make build` first.
 
                                         
 ## Contributors
