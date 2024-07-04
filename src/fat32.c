@@ -123,8 +123,9 @@ void update_shell_dir(int cluster,char* path,bool addDir){
     read_clusters(&cwd_table,cluster,1);
     shell_state.cur_cluster = cluster;
     char empty[1] = "";
-    if(addDir){
-        if(memcmp(path,empty,sizeof(char))==0){
+    char back[2] = "..";
+    if(addDir && memcmp(path,back,2)!=0){
+        if(memcmp(path,empty,1)==0){
             return;
         }   
         addPath(path);
@@ -249,7 +250,16 @@ int findEntry(struct FAT32DirectoryTable dir_table, char name[8], char ext[3])
 
 int findCluster(struct FAT32DriverRequest request){
     read_clusters(&fat32_driver_state.dir_table_buf.table, request.parent_cluster_number, 1);
-    int idx = findEntry(fat32_driver_state.dir_table_buf, request.name, request.ext);
+    int idx;
+    if(memcmp(request.name, "..\0\0\0\0\0\0", 8) == 0){
+        if(request.parent_cluster_number==2){
+            return 9999;
+        }
+        idx = 1;
+    }else{
+        idx = findEntry(fat32_driver_state.dir_table_buf, request.name, request.ext);
+    }
+
     if(idx==-9999){
         return 9999;
     }
